@@ -1,4 +1,4 @@
-# An OOP, terminal-based Hangman game built with Python 3.7.
+# An OOP, terminal-based Blackjack game built with Python 3.7.
 
 ## To run:
 
