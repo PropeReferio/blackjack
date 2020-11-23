@@ -12,6 +12,7 @@ class Player(Deck):
 	def __init__ (self):
 		Deck.__init__(self) #Is this right?
 		self.hand = []
+		#I'll need to make self.hand a list of lists to enable multiple hands for splitting
 		self.score = 0
 		self.busts = False
 	#Create a constructor for the player class that will hold the hand,cards,and tally the score
@@ -150,17 +151,4 @@ def main():
 	else:
 		print('This hand was a tie.')
 
-		
-	
-	#HINT: Continue to ask player if they want a hit or if they want to end the game
-	#Ask the player if they want a hit
-	#If they do, add the value of the card to their game tally
-	#If they stand, keep the game tally where it is - add to dealer only
-	
-	
-			
-		#Also add to the tally of the dealer while their tally is less than 16
-		#If the dealer and player tally are the same - display that result
-		#If dealer wins - display that result
-		#If player wins - display that result
 main()
