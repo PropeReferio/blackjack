@@ -53,22 +53,22 @@ class Player(Deck):
 	def bust(self):
 		if self.score > 21:
 			self.busts = True
-			print("{} busted!".format(self.name))
+			print(f"{self.name} busted!")
 			return True
 		return False #This will return a Bool, can be used to break out of the game
 
 class Human(Player):
 
-	def __init__(self,name, bj = False):
+	def __init__(self,name, blackJackBool = False):
 		Player.__init__(self)
 		self.name = name
-		self.bj = bj
+		self.blackJackBool = blackJackBool
 		self.hand = []
 	
 	def blackJack(self):
 		if self.getScore() == 21:
-			print("{} got Blackjack!!!".format(self.name))
-			self.bj = True
+			print(f"{self.name} got Blackjack!!!")
+			self.blackJackBool = True
 				  
 	def showHandPlayer(self):
 		print('Here is your hand:')
@@ -126,23 +126,23 @@ def main():
 	human_player.deal()
 	human_player.blackJack() #Make sure game ends
 	human_player.showHandPlayer()
-	if not human_player.bj:
+	if not human_player.blackJackBool:
 		dealer_player.showHand()
 	wanthit = 'y'
-	while not human_player.busts and wanthit == 'y' and not human_player.bj: #Player's hits
+	while not human_player.busts and wanthit == 'y' and not human_player.blackJackBool: #Player's hits
 		wanthit = input('Would you like to take a hit? (y/n) ')
 		if wanthit.lower() == 'y':
 			human_player.hitPlayer()
 			human_player.getScore()
 			human_player.bust()
-	if dealer_player.getScore() < 17 and not human_player.busts and not human_player.bj:
+	if dealer_player.getScore() < 17 and not human_player.busts and not human_player.blackJackBool:
 		print('Dealer takes a hit!')
 		dealer_player.hitPlayer()
 		dealer_player.getScore()
 		dealer_player.bust()
 	dealer_player.showHandEnd()
-	print(human_player.name + ' had a score of ' + str(human_player.score))
-	print(dealer_player.name + ' had a score of ' + str(dealer_player.score))
+	print(f'{human_player.name} had a score of {str(human_player.score)}')
+	print(f'{dealer_player.name} had a score of {str(dealer_player.score)}')
 	if human_player.busts or (dealer_player.score > human_player.score and not dealer_player.busts):
 		print(f'{dealer_player.name} wins!')
 	elif dealer_player.busts or (human_player.score > dealer_player.score and not human_player.busts):
