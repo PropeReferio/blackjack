@@ -146,10 +146,10 @@ def main():
     dealer_player.showHandEnd()
     print(human_player.name + ' had a score of ' + str(human_player.score))
     print(dealer_player.name + ' had a score of ' + str(dealer_player.score))
-    if human_player.busts or dealer_player.score > human_player.score:
-        print(dealer_player.name + ' wins!')
-    elif dealer_player.busts or human_player.score > dealer_player.score:
-        print(human_player.name + ' wins!')
+    if human_player.busts or (dealer_player.score > human_player.score and not dealer_player.busts):
+        print(f'{dealer_player.name} wins!')
+    elif dealer_player.busts or (human_player.score > dealer_player.score and not human_player.busts):
+        print(f'{human_player.name} wins!')
     else:
         print('This hand was a tie.')
 
