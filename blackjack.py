@@ -11,33 +11,35 @@ class Player(Deck):
 
 	def __init__ (self):
 		Deck.__init__(self) #Is this right?
-		self.hand = []
+		self.hands = [[]]
 		#I'll need to make self.hand a list of lists to enable multiple hands for splitting
 		self.score = 0
+		self.curHand = 0
 		self.busts = False
 	#Create a constructor for the player class that will hold the hand,cards,and tally the score
 
 	def deal(self):
-		while len(self.hand) < 2:
+		while len(self.hands[0]) < 2:
 			card = (random.choice(self.deck["nums"]), random.choice(self.deck["suit"]))
 			if card not in self.used_cards:
-				self.hand.append(card)
+				self.hands[0].append(card)
 				self.used_cards.append(card)
 	
 	def hitPlayer(self):
-		start_length = len(self.hand)
-		while len(self.hand) == start_length:
+		stillNeedsCard = True
+		while stillNeedsCard:
 			card = (random.choice(self.deck["nums"]), random.choice(self.deck["suit"]))
 			if card not in self.used_cards:
-				self.hand.append(card)
+				self.hands[self.curHand].append(card)
 				print(str(card[0]) + card[1])
+				stillNeedsCard = False
 				
 	# Get total score based on the hand the user/player is given
 	def getScore(self):
 		score = 0
 		aces = 0
 		
-		for card in self.hand:
+		for card in self.hands[self.curHand]:
 			if isinstance(card[0], int):
 				score += card[0]
 			elif card[0] in "KQJ":
@@ -60,21 +62,75 @@ class Player(Deck):
 
 class Human(Player):
 
-	def __init__(self,name, blackJackBool = False):
+	def __init__(self, name, blackJackBool = False):
 		Player.__init__(self)
-		self.name = name
+		self.name = name #I should move this (and the dealer's name) up to Player class
 		self.blackJackBool = blackJackBool
-		self.hand = []
+		self.hands = [[('A', '♠'), ('A', '♣')]] #Start with a split for now
+
+	def deal(self, hand_index):
+		while len(self.hands[hand_index]) < 2:
+			card = (random.choice(self.deck["nums"]), random.choice(self.deck["suit"]))
+			if card not in self.used_cards:
+				self.hands[hand_index].append(card)
+				self.used_cards.append(card)
+		self.showHandPlayer()
+		self.promptSplit(hand_index) #We need to show all hands before prompting to split.
+	
+	def promptSplit(self, hand_index):
+		for hand in range(len(self.hands)): #Should I be using a queue or stack?
+			if self.hands[hand_index][0][0] == self.hands[hand_index][1][0]:
+				stillNeedsToChoose = True
+				while stillNeedsToChoose:
+					choice = input("Would you like to split your hand? (y/n)").lower()
+					if choice == 'y' or choice == 'n':
+						stillNeedsToChoose = False
+				if choice == 'y':
+					self.split(hand_index) # May need to pass in a hand here
+
+	def split(self, hand_index):
+		#Take each card and make each one the first card of a hand, the original hand and a new hand.
+		self.hands.append([])
+		card_1 = self.hands[hand_index][0]
+		card_2 = self.hands[hand_index][1]
+		self.hands[hand_index] = [card_1]
+		self.hands[-1] = [card_2] # The last hand in self.hands, in case you're looking at the first of two
+		#hands which both need to be split, you don't overwrite a hand.
+		self.deal(hand_index)
+		self.deal(-1)
+
+	def getScore(self):
+		score = 0
+		aces = 0
+		
+		for card in self.hands[self.curHand]:
+			if isinstance(card[0], int):
+				score += card[0]
+			elif card[0] in "KQJ":
+				score += 10
+			else:
+				score += 11
+				aces += 1
+		while score > 21 and aces > 0:
+			score -= 10
+			aces -= 1
+		self.score = score  #This updates the self.score of the player
+		return score         #This gives a value that can be printed for the user's sake
 	
 	def blackJack(self):
 		if self.getScore() == 21:
 			print(f"{self.name} got Blackjack!!!")
 			self.blackJackBool = True
-				  
+			
 	def showHandPlayer(self):
-		print('Here is your hand:')
-		for card in self.hand:
-			print(str(card[0]) + card[1])
+		if len(self.hands) == 1:
+			print('Here is your hand:')
+		else:
+			print('Here are your hands:')
+		print('self.hands: ', self.hands)
+		for hand in self.hands:
+			for card in hand:
+				print(str(card[0]) + card[1])
 				
 				
 class Dealer(Player):
@@ -85,11 +141,11 @@ class Dealer(Player):
 				
 	def showHand(self):
 		print("Dealer's face-up card:")
-		print(str(self.hand[0][0]) + self.hand[0][1])
+		print(str(self.hands[self.curHand][0][0]) + self.hands[self.curHand][0][1])
 		
 	def showHandEnd(self):
 		print("Here is the dealer's hand:")
-		for card in self.hand:
+		for card in self.hands[self.curHand]:
 			print(str(card[0]) + card[1])
 	
 
@@ -123,10 +179,9 @@ def main():
 	game = Game('Tuesday')
 			  
 	#Ask the player how many decks they want to use - Then print the number of decks
+	human_player.deal(human_player.curHand)
 	dealer_player.deal()
-	human_player.deal()
 	human_player.blackJack() #Make sure game ends
-	human_player.showHandPlayer()
 	if not human_player.blackJackBool:
 		dealer_player.showHand()
 	wanthit = 'y'
