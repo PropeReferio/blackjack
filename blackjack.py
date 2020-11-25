@@ -11,7 +11,7 @@ class Deck():
 
 class Hand():
 	def __init__(self):
-		self.cards = [("A", '♣'), ("A", '♦')]
+		self.cards = []
 		self.busted = False
 		self.score = 0
 
@@ -75,7 +75,7 @@ class Player(Deck):
 			# return self.busted
 
 	def getScore(self):
-		self.score = max([hand.getScore() for hand in self.hands if hand.getScore() <= 21])
+		self.score = max([hand.getScore() if hand.getScore() <= 21 else 0 for hand in self.hands])
 		return self.score
 
 				
@@ -184,26 +184,21 @@ class Game(Dealer, Human):
 	
 wanthit = 'y'
 def main():
-	human_player = Human(input("What is Your Name? "))
+	# human_player = Human(input("What is Your Name? "))
+	human_player = Human('Bo')
 	dealer_player = Dealer()
-	# game = Game('Tuesday')
-			  
-	#Ask the player how many decks they want to use - Then print the number of decks
-	human_player.deal(human_player.curHand)
 	dealer_player.deal()
-	if len(human_player.hands) == 1:
-		human_player.showHandPlayer()
+	human_player.deal(human_player.curHand)
+	# if len(human_player.hands) == 1:
+	# 	human_player.showHandPlayer()
 	human_player.blackJack() #Make sure game ends
 	if not human_player.blackJackBool:
 		dealer_player.showHand()
 	for _ in range(len(human_player.hands)):
 		wanthit = 'y'
-		while not human_player.hands[human_player.curHand].busted and wanthit == 'y' and not human_player.blackJackBool: #Player's hits
-			if human_player.curHand >= 1:
-				# human_player.showHandPlayer()
-				print(f'Moving on to hand #{human_player.curHand + 1}!')
+		while not human_player.hands[human_player.curHand].busted and wanthit == 'y' and not human_player.blackJackBool:
 			human_player.showHandPlayer()
-			wanthit = input('Would you like to take a hit? (y/n) ')
+			wanthit = input(f'Would you like to take a hit on hand #{human_player.curHand + 1}? (y/n) ')
 			if wanthit.lower() == 'y':
 				human_player.hitPlayer()
 				human_player.getScore()
