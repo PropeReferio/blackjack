@@ -6,7 +6,8 @@ class Deck():
 	def __init__(self):
 		self.deck = {"nums" : ["A", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "K", "Q"],
 					 "suit" : ['♠', '♣', '♥', '♦']}
-		self.used_cards = []
+		self.used_cards = [] # Should move used cards outside of Deck... because each player instantiates
+		# with their own self.used_cards
 
 class Hand():
 	def __init__(self):
@@ -41,14 +42,13 @@ class Hand():
 		
 class Player(Deck):
 
-	def __init__ (self):
-		Deck.__init__(self) #Is this right?
+	def __init__ (self, name):
+		Deck.__init__(self)
 		self.hands = [Hand()]
-		#I'll need to make self.hand a list of lists to enable multiple hands for splitting
 		self.score = 0
 		self.curHand = 0
 		self.busted = False
-	#Create a constructor for the player class that will hold the hand,cards,and tally the score
+		self.name = name
 
 	def deal(self):
 		while len(self.hands[0].cards) < 2:
@@ -83,11 +83,9 @@ class Player(Deck):
 
 class Human(Player):
 
-	def __init__(self, name, blackJackBool = False):
-		Player.__init__(self)
-		self.name = name #I should move this (and the dealer's name) up to Player class
-		self.blackJackBool = blackJackBool
-		# self.hands = [[('A', '♠'), ('A', '♣')]] #Start with a split for now
+	def __init__(self, name):
+		Player.__init__(self, name)
+		self.blackJackBool = False
 
 	def deal(self, hand_index):
 		while len(self.hands[hand_index].cards) < 2:
@@ -104,7 +102,7 @@ class Human(Player):
 				stillNeedsToChoose = True
 				while stillNeedsToChoose:
 					time.sleep(0.5)
-					choice = input("Would you like to split your hand? (y/n)").lower()
+					choice = input("Would you like to split your hand? (y/n) ").lower()
 					if choice == 'y' or choice == 'n':
 						stillNeedsToChoose = False
 				if choice == 'y':
@@ -120,38 +118,21 @@ class Human(Player):
 		#hands which both need to be split, you don't overwrite a hand.
 		self.deal(hand_index)
 		self.deal(-1)
-
-	# def getScore(self):
-	# 	score = 0
-	# 	aces = 0
-		
-	# 	for card in self.hands[self.curHand]:
-	# 		if isinstance(card[0], int):
-	# 			score += card[0]
-	# 		elif card[0] in "KQJ":
-	# 			score += 10
-	# 		else:
-	# 			score += 11
-	# 			aces += 1
-	# 	while score > 21 and aces > 0:
-	# 		score -= 10
-	# 		aces -= 1
-	# 	self.score = score  #This updates the self.score of the player
-	# 	return score         #This gives a value that can be printed for the user's sake
 	
 	def blackJack(self):
 		if self.getScore() == 21:
+			time.sleep(0.5)
 			print(f"{self.name} got Blackjack!!!")
 			self.blackJackBool = True
 			
 	def showHandPlayer(self):
 		time.sleep(0.5)
 		if len(self.hands) == 1:
-			print('Here is your hand:')
+			print('\nHere is your hand:')
 			for card in self.hands[0].cards:
 				print(str(card[0]) + card[1])
 		else:
-			print('Here are your hands:')
+			print('\nHere are your hands:')
 			for hand in range(len(self.hands)):
 				time.sleep(1)
 				print(f'Hand #{hand + 1}: ')
@@ -161,15 +142,16 @@ class Human(Player):
 				
 class Dealer(Player):
 
-	def __init__(self, name):
-		Player.__init__(self)
-		self.name = "Dealer"
+	def __init__(self):
+		Player.__init__(self, name='Dealer')
+		# self.name = name
 				
 	def showHand(self):
 		print("Dealer's face-up card:")
 		print(str(self.hands[self.curHand].cards[0][0]) + self.hands[self.curHand].cards[0][1])
 		
 	def showHandEnd(self):
+		time.sleep(0.5)
 		print("Here is the dealer's hand:")
 		for card in self.hands[self.curHand].cards:
 			print(str(card[0]) + card[1])
@@ -179,7 +161,7 @@ class Game(Dealer, Human):
 
 	#Define a constructor that will have a dealer,human,and players(the dealer and the human)
 	def __init__(self, name):
-		Dealer.__init__(self, name)
+		Dealer.__init__(self)
 		Human.__init__(self, name)
 		self.name = name
 	
@@ -201,7 +183,7 @@ class Game(Dealer, Human):
 wanthit = 'y'
 def main():
 	human_player = Human(input("What is Your Name? "))
-	dealer_player = Dealer('Dealer')
+	dealer_player = Dealer()
 	game = Game('Tuesday')
 			  
 	#Ask the player how many decks they want to use - Then print the number of decks
@@ -214,7 +196,7 @@ def main():
 		dealer_player.showHand()
 	for _ in range(len(human_player.hands)):
 		wanthit = 'y'
-		while not human_player.busted and wanthit == 'y' and not human_player.blackJackBool: #Player's hits
+		while not human_player.hands[human_player.curHand].busted and wanthit == 'y' and not human_player.blackJackBool: #Player's hits
 			if human_player.curHand >= 1:
 				human_player.showHandPlayer()
 				print(f'Moving on to hand #{human_player.curHand + 1}!')
@@ -234,14 +216,19 @@ def main():
 		dealer_player.checkBusted()
 	dealer_player.showHandEnd()
 	if not human_player.busted:
-		print(f'{human_player.name} had a score of {str(human_player.score)}')
+		time.sleep(0.5)
+		print(f'\n{human_player.name} had a score of {str(human_player.score)}')
 	if not dealer_player.busted:
+		time.sleep(0.5)
 		print(f'{dealer_player.name} had a score of {str(dealer_player.score)}')
 	if human_player.busted or (dealer_player.score > human_player.score and not dealer_player.busted):
+		time.sleep(0.5)
 		print(f'{dealer_player.name} wins!')
 	elif dealer_player.busted or (human_player.score > dealer_player.score and not human_player.busted):
+		time.sleep(0.5)
 		print(f'{human_player.name} wins!')
 	else:
+		time.sleep(0.5)
 		print('This hand was a tie.')
 
 main()
