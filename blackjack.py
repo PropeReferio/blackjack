@@ -95,10 +95,10 @@ class Human(Player):
 			if card not in self.used_cards:
 				self.hands[hand_index].cards.append(card)
 				self.used_cards.append(card)
+		self.showHandPlayer()
 		self.promptSplit(hand_index) #We need to show all hands before prompting to split.
 	
 	def promptSplit(self, hand_index):
-		self.showHandPlayer()
 		for hand in range(len(self.hands)): #Should I be using a queue or stack?
 			if self.hands[hand_index].cards[0][0] == self.hands[hand_index].cards[1][0]:
 				stillNeedsToChoose = True
