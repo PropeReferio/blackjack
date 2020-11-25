@@ -30,8 +30,8 @@ class Hand():
 		while score > 21 and aces > 0:
 			score -= 10
 			aces -= 1
-		self.score = score  #This updates the self.score of the player
-		return score         #This gives a value that can be printed for the user's sake
+		self.score = score
+		return score
 
 	def bust(self):
 		if self.score > 21:
@@ -69,17 +69,12 @@ class Player(Deck):
 	def checkBusted(self):
 		if len(self.hands) == 1 and self.hands[0].busted:
 			self.busted = True
-			# return True
 		else:
 			self.busted = all([hand.busted for hand in self.hands])
-			# return self.busted
 
 	def getScore(self):
 		self.score = max([hand.getScore() if hand.getScore() <= 21 else 0 for hand in self.hands])
 		return self.score
-
-				
-	# Get total score based on the hand the user/player is given
 
 class Human(Player):
 
@@ -145,7 +140,6 @@ class Dealer(Player):
 
 	def __init__(self):
 		Player.__init__(self, name='Dealer')
-		# self.name = name
 				
 	def showHand(self):
 		time.sleep(1)
@@ -158,40 +152,13 @@ class Dealer(Player):
 		for card in self.hands[self.curHand].cards:
 			print(str(card[0]) + card[1])
 	
-
-class Game(Dealer, Human):
-
-	#Define a constructor that will have a dealer,human,and players(the dealer and the human)
-	def __init__(self, name):
-		Dealer.__init__(self)
-		Human.__init__(self, name)
-		self.name = name
-	
-	#Define a method to display a message if the user/player wins
-	# def winner(self):
-		# if human_player.busts or dealer_player.score > human_player.score:
-		#     print(dealer_player.name + ' wins!')
-		# elif dealer_player.busts or human_player.score > dealer_player.score:
-		#     print(human_player.name + ' wins!')
-		# else:
-		#     print('This hand was a tie.')
-			  
-	#Define a method to display a message if the user/player pushes
-
-			  
-	#Define a method to display a message if the user/player loses    
-
-	
 wanthit = 'y'
 def main():
-	# human_player = Human(input("What is Your Name? "))
-	human_player = Human('Bo')
+	human_player = Human(input("What is Your Name? "))
 	dealer_player = Dealer()
 	dealer_player.deal()
 	human_player.deal(human_player.curHand)
-	# if len(human_player.hands) == 1:
-	# 	human_player.showHandPlayer()
-	human_player.blackJack() #Make sure game ends
+	human_player.blackJack()
 	if not human_player.blackJackBool:
 		dealer_player.showHand()
 	for _ in range(len(human_player.hands)):
