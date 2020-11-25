@@ -75,7 +75,7 @@ class Player(Deck):
 			# return self.busted
 
 	def getScore(self):
-		self.score = max([hand.getScore() for hand in self.hands])
+		self.score = max([hand.getScore() for hand in self.hands if hand.getScore() <= 21])
 		return self.score
 
 				
@@ -93,12 +93,12 @@ class Human(Player):
 			if card not in self.used_cards:
 				self.hands[hand_index].cards.append(card)
 				self.used_cards.append(card)
-		self.showHandPlayer()
 		self.promptSplit(hand_index) #We need to show all hands before prompting to split.
 	
 	def promptSplit(self, hand_index):
 		for hand in range(len(self.hands)): #Should I be using a queue or stack?
 			if self.hands[hand_index].cards[0][0] == self.hands[hand_index].cards[1][0]:
+				self.showHandPlayer()
 				stillNeedsToChoose = True
 				while stillNeedsToChoose:
 					time.sleep(0.5)
@@ -123,10 +123,11 @@ class Human(Player):
 		if self.getScore() == 21:
 			time.sleep(0.5)
 			print(f"{self.name} got Blackjack!!!")
+			self.showHandPlayer()
 			self.blackJackBool = True
 			
 	def showHandPlayer(self):
-		time.sleep(0.5)
+		time.sleep(1)
 		if len(self.hands) == 1:
 			print('\nHere is your hand:')
 			for card in self.hands[0].cards:
@@ -147,11 +148,12 @@ class Dealer(Player):
 		# self.name = name
 				
 	def showHand(self):
+		time.sleep(1)
 		print("Dealer's face-up card:")
 		print(str(self.hands[self.curHand].cards[0][0]) + self.hands[self.curHand].cards[0][1])
 		
 	def showHandEnd(self):
-		time.sleep(0.5)
+		time.sleep(1)
 		print("Here is the dealer's hand:")
 		for card in self.hands[self.curHand].cards:
 			print(str(card[0]) + card[1])
@@ -184,7 +186,7 @@ wanthit = 'y'
 def main():
 	human_player = Human(input("What is Your Name? "))
 	dealer_player = Dealer()
-	game = Game('Tuesday')
+	# game = Game('Tuesday')
 			  
 	#Ask the player how many decks they want to use - Then print the number of decks
 	human_player.deal(human_player.curHand)
@@ -198,8 +200,9 @@ def main():
 		wanthit = 'y'
 		while not human_player.hands[human_player.curHand].busted and wanthit == 'y' and not human_player.blackJackBool: #Player's hits
 			if human_player.curHand >= 1:
-				human_player.showHandPlayer()
+				# human_player.showHandPlayer()
 				print(f'Moving on to hand #{human_player.curHand + 1}!')
+			human_player.showHandPlayer()
 			wanthit = input('Would you like to take a hit? (y/n) ')
 			if wanthit.lower() == 'y':
 				human_player.hitPlayer()
