@@ -9,6 +9,7 @@ class Deck():
 		self.used_cards = [] # Should move used cards outside of Deck... because each player instantiates
 		# with their own self.used_cards
 
+deck = Deck()
 class Hand():
 	def __init__(self):
 		self.cards = []
@@ -53,16 +54,17 @@ class Player(Deck):
 	def deal(self):
 		while len(self.hands[0].cards) < 2:
 			card = (random.choice(self.deck["nums"]), random.choice(self.deck["suit"]))
-			if card not in self.used_cards:
+			if card not in deck.used_cards:
 				self.hands[0].cards.append(card)
-				self.used_cards.append(card)
+				deck.used_cards.append(card)
 	
 	def hitPlayer(self):
 		stillNeedsCard = True
 		while stillNeedsCard:
 			card = (random.choice(self.deck["nums"]), random.choice(self.deck["suit"]))
-			if card not in self.used_cards:
+			if card not in deck.used_cards:
 				self.hands[self.curHand].cards.append(card)
+				deck.used_cards.append(card)
 				print(str(card[0]) + card[1])
 				stillNeedsCard = False
 
@@ -85,9 +87,9 @@ class Human(Player):
 	def deal(self, hand_index):
 		while len(self.hands[hand_index].cards) < 2:
 			card = (random.choice(self.deck["nums"]), random.choice(self.deck["suit"]))
-			if card not in self.used_cards:
+			if card not in deck.used_cards:
 				self.hands[hand_index].cards.append(card)
-				self.used_cards.append(card)
+				deck.used_cards.append(card)
 		self.promptSplit(hand_index) #We need to show all hands before prompting to split.
 	
 	def promptSplit(self, hand_index):
@@ -154,9 +156,11 @@ class Dealer(Player):
 	
 wanthit = 'y'
 def main():
+	# deck = Deck()
 	human_player = Human(input("What is Your Name? "))
 	dealer_player = Dealer()
 	dealer_player.deal()
+	#These are out of order just for order of print statements.
 	human_player.deal(human_player.curHand)
 	human_player.blackJack()
 	if not human_player.blackJackBool:
