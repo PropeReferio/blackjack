@@ -4,7 +4,7 @@
 
 1. Make sure python is installed on your computer.
 2. Navigate in your terminal to the directory that contains blackjack.py.
-3. (Optional, but recommended) Create a virtual environment by running `python -m venv venv`
+3. (Optional, but recommended) Create a virtual environment by running `python -m venv venv` and activate it with `source venv/bin/activate`
 4. Run `pip install requirements.txt` to install dependencies
 5. Run `python3 blackjack.py` to start the game
 6. Have fun playing!
